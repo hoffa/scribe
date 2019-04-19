@@ -33,6 +33,7 @@
 #include "thrift/transport/TFileTransport.h"
 #include "thrift/transport/TBufferTransports.h"
 #include "thrift/transport/TSimpleFileTransport.h"
+#include "thrift/transport/TNonblockingServerSocket.h"
 
 #include "fb303/FacebookBase.h"
 
@@ -92,7 +93,7 @@ namespace concurrency {
 
   // returns a new instance of read/write mutex.
   // you can choose different implementations based on your needs.
-  boost::shared_ptr<ReadWriteMutex> createReadWriteMutex();
+  std::shared_ptr<ReadWriteMutex> createReadWriteMutex();
 
 } // !namespace scribe::concurrency
 

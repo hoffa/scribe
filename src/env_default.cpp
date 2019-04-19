@@ -33,8 +33,6 @@ using namespace apache::thrift::concurrency;
 using namespace scribe::thrift;
 using namespace scribe::concurrency;
 
-using boost::shared_ptr;
-
 /*
  * Network configuration and directory services
  */
@@ -49,8 +47,8 @@ bool scribe::network_config::getService(const std::string& serviceName,
  * Concurrency mechanisms
  */
 
-shared_ptr<ReadWriteMutex> scribe::concurrency::createReadWriteMutex() {
-  return shared_ptr<ReadWriteMutex>(new ReadWriteMutex());
+std::shared_ptr<ReadWriteMutex> scribe::concurrency::createReadWriteMutex() {
+  return std::shared_ptr<ReadWriteMutex>(new ReadWriteMutex());
 }
 
 /*
@@ -97,12 +95,12 @@ uint32_t scribe::strhash::hash32(const char *s) {
  */
 // note: this function uses global g_Handler.
 void scribe::startServer() {
-  boost::shared_ptr<TProcessor> processor(new scribeProcessor(g_Handler));
+  std::shared_ptr<TProcessor> processor(new scribeProcessor(g_Handler));
   /* This factory is for binary compatibility. */
-  boost::shared_ptr<TProtocolFactory> protocol_factory(
+  std::shared_ptr<TProtocolFactory> protocol_factory(
     new TBinaryProtocolFactory(0, 0, false, false)
   );
-  boost::shared_ptr<ThreadManager> thread_manager;
+  std::shared_ptr<ThreadManager> thread_manager;
 
   if (g_Handler->numThriftServerThreads > 1) {
     // create a ThreadManager to process incoming calls
@@ -110,15 +108,16 @@ void scribe::startServer() {
       g_Handler->numThriftServerThreads
     );
 
-    shared_ptr<PosixThreadFactory> thread_factory(new PosixThreadFactory());
+    std::shared_ptr<PosixThreadFactory> thread_factory(new PosixThreadFactory());
     thread_manager->threadFactory(thread_factory);
     thread_manager->start();
   }
 
-  shared_ptr<TNonblockingServer> server(new TNonblockingServer(
+  std::shared_ptr<TNonblockingServerSocket> socket(new TNonblockingServerSocket(g_Handler->port));
+  std::shared_ptr<TNonblockingServer> server(new TNonblockingServer(
                                           processor,
                                           protocol_factory,
-                                          g_Handler->port,
+                                          socket,
                                           thread_manager
                                         ));
   g_Handler->setServer(server);

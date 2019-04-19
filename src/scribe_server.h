@@ -69,14 +69,14 @@ class scribeHandler : virtual public scribe::thrift::scribeIf,
   void incCounter(std::string counter, long amount);
 
   inline void setServer(
-      boost::shared_ptr<apache::thrift::server::TNonblockingServer> & server) {
+      std::shared_ptr<apache::thrift::server::TNonblockingServer> & server) {
     this->server = server;
   }
   unsigned long getMaxConn() {
     return maxConn;
   }
  private:
-  boost::shared_ptr<apache::thrift::server::TNonblockingServer> server;
+  std::shared_ptr<apache::thrift::server::TNonblockingServer> server;
 
   unsigned long checkPeriod; // periodic check interval for all contained stores
 
@@ -105,7 +105,7 @@ class scribeHandler : virtual public scribe::thrift::scribeIf,
    * A single mutex is fine since it only needs to be locked in write mode
    * during start/stop/reinitialize or when we need to create a new category.
    */
-  boost::shared_ptr<apache::thrift::concurrency::ReadWriteMutex>
+  std::shared_ptr<apache::thrift::concurrency::ReadWriteMutex>
     scribeHandlerLock;
 
   // disallow empty construction, copy, and assignment
@@ -132,5 +132,5 @@ class scribeHandler : virtual public scribe::thrift::scribeIf,
   void addMessage(const scribe::thrift::LogEntry& entry,
                   const boost::shared_ptr<store_list_t>& store_list);
 };
-extern boost::shared_ptr<scribeHandler> g_Handler;
+extern std::shared_ptr<scribeHandler> g_Handler;
 #endif // SCRIBE_SERVER_H
